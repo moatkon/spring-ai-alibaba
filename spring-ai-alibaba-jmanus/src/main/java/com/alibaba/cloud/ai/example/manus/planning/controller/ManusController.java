@@ -15,6 +15,7 @@
  */
 package com.alibaba.cloud.ai.example.manus.planning.controller;
 
+import com.alibaba.cloud.ai.example.manus.config.DevDebugConfig;
 import com.alibaba.cloud.ai.example.manus.planning.PlanningFactory;
 import com.alibaba.cloud.ai.example.manus.planning.coordinator.PlanIdDispatcher;
 import com.alibaba.cloud.ai.example.manus.planning.coordinator.PlanningCoordinator;
@@ -61,6 +62,9 @@ public class ManusController {
 	private UserInputService userInputService;
 
 	@Autowired
+	private DevDebugConfig devDebugConfig;
+
+	@Autowired
 	public ManusController(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 		// Register JavaTimeModule to handle LocalDateTime serialization/deserialization
@@ -89,16 +93,27 @@ public class ManusController {
 		// 获取或创建规划流程
 		PlanningCoordinator planningFlow = planningFactory.createPlanningCoordinator(planId);
 
-		// 异步执行任务
-		CompletableFuture.supplyAsync(() -> {
+		if(devDebugConfig.getDevDebug()){
 			try {
-				return planningFlow.executePlan(context);
+				planningFlow.executePlan(context);
 			}
 			catch (Exception e) {
-				logger.error("执行计划失败", e);
-				throw new RuntimeException("执行计划失败: " + e.getMessage(), e);
+				logger.error("[debug]执行计划失败", e);
+				throw new RuntimeException("[debug]执行计划失败: " + e.getMessage(), e);
 			}
-		});
+		}else{
+			// 异步执行任务
+			CompletableFuture.supplyAsync(() -> {
+				try {
+					return planningFlow.executePlan(context);
+				}
+				catch (Exception e) {
+					logger.error("执行计划失败", e);
+					throw new RuntimeException("执行计划失败: " + e.getMessage(), e);
+				}
+			});
+			}
+
 
 		// 返回任务ID及初始状态
 		Map<String, Object> response = new HashMap<>();
