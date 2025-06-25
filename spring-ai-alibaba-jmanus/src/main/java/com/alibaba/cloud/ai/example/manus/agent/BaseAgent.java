@@ -255,10 +255,11 @@ public abstract class BaseAgent {
 			throw e; // 重新抛出异常，让上层调用者知道发生了错误
 		}
 		finally {
+			// notey: 最终设定为完成，如果有异常,会直接抛出异常给上游的
 			state = AgentState.COMPLETED; // Reset state after execution
 
 			agentRecord.setStatus(state.toString());
-			llmService.clearAgentMemory(planId);
+			llmService.clearAgentMemory(planId); // notey: 清理当前Agent的记忆
 		}
 		return results.isEmpty() ? "" : results.get(results.size() - 1);
 	}

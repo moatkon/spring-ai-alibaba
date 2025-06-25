@@ -90,7 +90,7 @@ public class PlanExecutor {
 				for (ExecutionStep step : steps) {
 					BaseAgent executorinStep = executeStep(step, context);
 					if (executorinStep != null) {
-						executor = executorinStep;
+						executor = executorinStep; // notey: 记录这个完全是为了下面的finally逻辑,planId维度。感觉有点浪费啊
 					}
 				}
 			}

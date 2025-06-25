@@ -188,7 +188,7 @@ public class DynamicAgent extends ReActAgent {
 		ToolExecutionResult toolExecutionResult = null;
 		try {
 			List<ToolCall> toolCalls = response.getResult().getOutput().getToolCalls();
-			ToolCall toolCall = toolCalls.get(0);
+			ToolCall toolCall = toolCalls.get(0);// notey: 大模型调用一个工具
 
 			thinkActRecord.startAction("Executing tool: " + toolCall.name(), toolCall.name(), toolCall.arguments());
 
@@ -229,7 +229,7 @@ public class DynamicAgent extends ReActAgent {
 								.build();
 							processUserInputToMemory(userMessage); // Process user input
 																	// to memory
-							llmCallResponse = formInputTool.getCurrentToolStateString();
+							llmCallResponse = formInputTool.getCurrentToolStateString(); // ntoey: 这一步没什么用，就是为了record的记录更完善
 
 						}
 						else if (formInputTool.getInputState() == FormInputTool.InputState.INPUT_TIMEOUT) {
@@ -264,7 +264,7 @@ public class DynamicAgent extends ReActAgent {
 			thinkActRecord.recordError(e.getMessage());
 			userInputService.removeFormInputTool(getPlanId()); // Clean up on error
 			processMemory(toolExecutionResult); // Process memory even on error
-			return new AgentExecResult(e.getMessage(), AgentState.FAILED);
+			return new AgentExecResult(e.getMessage(), AgentState.FAILED); // notey: 代码没有针对FAILED做逻辑....
 		}
 	}
 
